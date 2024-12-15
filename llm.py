@@ -3,7 +3,7 @@ from random import shuffle
 import re
 
 # Generate a Gemini Key at https://aistudio.google.com/app/apikey
-genai.configure(api_key="AIzaSyAfGBMxpu2RU_a_YxKJ6bf39aDdA0Z4oX4")
+genai.configure(api_key="GEMINI Key")
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 def GetGeneral(incorrect):
