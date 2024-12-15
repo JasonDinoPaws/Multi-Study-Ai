@@ -5,3 +5,6 @@ Using the google Gemini API to generate questions for any test that is online. A
 # Installing 
 pip install tkinter
 pip install keyboard
+
+# API key creation
+https://aistudio.google.com/app/apikey
