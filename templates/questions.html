@@ -1,0 +1,268 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="redirects.js"></script>
+</head>
+<body style="margin-bottom: 0;"  oncontextmenu="return false"> 
+    <div id="Questioning" style="display: none;">
+        <div id="header" style="width: 99%; height: 50; position: absolute; top: 5;background-color: black; display: flex;"> 
+            <h1 id="index" style="width: 400; background-color: wheat; height: 100%;margin: 0 10;"> Question 1</h1> 
+            <h1 id = "ans/tot" style="width: 75; background-color: wheat; height: 100%;margin: 0 10; position: absolute; right: 10;text-align: right;"> 1/2</h1>
+            <button id="flagged" style="position: absolute;right: 100;justify-content: right; height: 85%;margin-top: 4;" onclick="flagquestion()">Flag Question<img class='flag' src='/Images/flag.png'></button>
+        </div>
+        <div style="background-color: wheat; width: 99%; height: 87%; position: absolute;top: 60;">
+            <h2 id="Question" style="margin: 0 5; width: 99%;background-color: white;height: 10%;">What video connecter gives out analog video?</h2>
+            <div id="options">
+                <button style="width: 99%;margin: 10 5;height: 50;"><h2 style="text-align: left;margin: 0;">A. VGA</h2></button>
+                <button style="width: 99%;margin: 10 5;height: 50;"><h2 style="text-align: left;margin: 0;">B. HDMI</h2></button>
+                <button style="width: 99%;margin: 10 5;height: 50;"><h2 style="text-align: left;margin: 0;">C. DVI</h2></button>
+                <button style="width: 99%;margin: 10 5;height: 50;"><h2 style="text-align: left;margin: 0;">D. USB-C</h2></button>
+            </div>
+        </div>
+
+        <div id="footer" style="width: 99%; height: 50; position: absolute; bottom: 5;background-color: black; display: flex;"> 
+            <button class="footer_button_left" onclick="updatequestion(-1)"><- Back</button>
+            <h3 style="width: 100%;color: white;text-align: center;">Ai was used to generate questions and responses, it can be wrong</h3>
+            <button id="backtot" class="footer_button_right" onclick="review(false)">Back to total</button>
+            <button class="footer_button_right" onclick="updatequestion(1)">Next -></button>
+        </div>
+    </div>
+    <div id="totalview">
+        <div id="header" style="width: 99%; height: 50; position: absolute; top: 5;background-color: black; display: flex;"> 
+            <h1 style="width: 400; background-color: wheat; height: 100%;margin: 0 10;">Viewer</h1> 
+        </div>
+        <div  style="background-color: wheat; width: 99%; height: 87%; position: absolute;top: 60;" id="questions">
+            <button style="width: 99%;margin: 10 5;height: 50;"><h2 style="text-align: left;margin: 0;">Question 1<img class="flag" src="/Images/flag.png"></h2></button>
+        </div>
+        <div id="footer" style="width: 99%; height: 50; position: absolute; bottom: 5;background-color: black; display: flex;"> 
+            <h3 style="width: 100%;color: white;text-align: center;">Ai was used to generate questions and responses, it can be wrong</h3>
+            <button style="position: absolute;left: 10;justify-content: right; height: 85%;margin-top: 4;width: 115;" onclick="review(true)">Review Flagged</button>
+            <button style="position: absolute;right: 10;justify-content: right; height: 85%;margin-top: 4;width: 115;" onclick="submit()">Submit</button>
+        </div>
+    </div>
+
+    <div id="Wait" style="width: 100%;height: 100%;display: none;">
+        <h1 style="width: 100%;height: 100%; text-align: center;vertical-align: center;">
+            This may or may not take a bit. <br>
+            The Ai is generating your questions
+        </h1>
+        <img style="position: absolute;top: 0;" src="/Images/loading_animation.gif">
+    </div>
+    <div id="config" style="width: 100%;height: 100%;text-align: center;vertical-align: middle;align-items: center;display: none;">
+        <h1 style="width: 100%; text-align: center;vertical-align: center;" onshow="this.innerHTML=localStorage.getItem('topic')"></h1>
+        <h2 style="width: 100%; text-align: center;vertical-align: center;">How many questions would you like to be asked</h2>
+        <input id="amount" type="number" min="1" max="99" placeholder="# of questions" style="width: 10%; height: 50;text-align: center;" value="1" >
+        <h2 style="width: 100%; text-align: center;vertical-align: center;">What would you like the difficulty of each question to be</h2>
+        <select id="diffs" style="margin-bottom: 50;"><option>Click to choose</option></select>
+        <div style="width: 100%;">
+            <button style="width: 7.5%;" onclick="redirect('home')">Go back</button>
+            <button style="width: 7.5%;" onclick="Start(true)">Start Generateing</button>
+        </div>
+    </div>
+</body>
+<script>
+    // prevents inspect element
+    document.onkeydown = (e) => {
+        console.clear()
+        if (e.key == 123) {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && e.shiftKey && e.key == 'I') {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && e.shiftKey && e.key == 'C') {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && e.shiftKey && e.key == 'J') {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && e.key == 'U') {
+            e.preventDefault();
+        }
+    };
+</script>
+<script> 
+    const confg = document.getElementById("config")
+    const wait = document.getElementById("Wait")
+    const Main = document.getElementById("Questioning")
+    const totview = document.getElementById("totalview")
+    const amountint = document.getElementById("amount")
+    const diff = document.getElementById("diffs")
+
+    const type = localStorage.getItem("type")
+    const topic = localStorage.getItem("topic")
+    var started = false
+    var inxrev = 0
+    var inx = 0
+    var isrev = false
+    var qdata = {}
+    var answered = []
+    var flagged = []
+
+    function uiswitch(ui)
+    {
+        if (started) { return }
+        confg.style.display = "none"
+        wait.style.display = "none"
+        Main.style.display = "none"
+        totview.style.display = "none"
+        ui.style.display = ""
+    }
+
+    function Start(takein=false)
+    {
+        if (started) { return }
+        amount = ""
+        cdiff = ""
+
+        if (takein)
+        {
+           amount = document.getElementById("amount").value
+           cdiff = document.getElementById("diffs").value
+           if (cdiff == diff.children[0].innerHTML)
+           {
+                alert("Choose a difficulty")
+                return;
+           }
+        }
+
+        uiswitch(wait)
+        fetch("/Ai/Gen_Questions/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ topic, amount, cdiff })
+            })
+            .then(async response => response.json())
+            .then(data => {
+                qdata = data
+                uiswitch(Main)
+                updatequestion()
+            })
+    }
+
+    if (type == "practice")
+        Start()
+    else{
+        uiswitch(confg)
+        fetch("/get/Difficultys")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(element => {
+                    console.log(element)
+                    opt = document.createElement("Option")
+                    opt.innerHTML = element
+                    diff.append(opt)
+                });
+            })
+    }
+
+
+
+    const num = document.getElementById("index")
+    const question = document.getElementById("Question")
+    const options = document.getElementById("options")
+    const flag = document.getElementById("flagged")
+    const total = document.getElementById("ans/tot")
+    const totbutton = document.getElementById("backtot")
+    const questions = document.getElementById("questions")
+
+    function updatequestion(inc=0)
+    {
+        if (isrev)
+        {
+            if (inxrev+inc == flagged.length) { review(false); return }
+            else if (inxrev+inc < 0) { return }
+            inxrev = inxrev+inc
+            inx = flagged[inxrev] 
+        }
+        else
+        {
+            if (inx+inc == qdata.length) { review(false); return }
+            else if (inx+inc < 0) { return }
+            inx =  inx+inc
+        }
+            
+        uiswitch(Main)
+        if (flagged.indexOf(inx) == -1)
+            flag.style.backgroundColor = "#DD0000"
+        else
+            flag.style.backgroundColor = "#00DD00"
+        
+        totbutton.style.display = answered.length == qdata.length? "":"none"
+        total.innerHTML = answered.length+"/"+qdata.length
+        num.innerHTML = "Question "+(inx+1)
+        question.innerHTML = qdata[inx].Question
+        options.innerHTML = ""
+        for (i = 0; i < qdata[inx].Options.length; i++)
+        {
+            button = document.createElement("button")
+            h2 = document.createElement("h2")
+
+            button.className = "questionbutton"
+            button.onclick = pickanswer.bind(NaN,i)
+            if (answered[inx] == i)
+                button.style.backgroundColor = "#00AA00"
+            h2.innerHTML = (i+1)+": "+qdata[inx].Options[i]
+
+            button.append(h2)
+            options.append(button)
+        }
+    }
+    function jumptoquestion(quest)
+    {
+        if (quest > -1 && quest < qdata.length)
+        {
+            inx = quest
+            updatequestion()
+        }
+    }
+    function flagquestion()
+    {
+        if (flagged.indexOf(inx) == -1)
+            flagged.push(inx)
+        else
+            flagged.pop(flagged.indexOf(inx))
+        updatequestion()
+    }
+    function review(isquest)
+    {
+        if (answered.length != qdata.length) { return }
+        isrev = isquest
+        if (isquest)
+        {
+            inxrev = 0
+            updatequestion(flagged[inxrev])
+            return
+        }
+        
+        questions.innerHTML = ""
+        for (i = 0; i < qdata.length; i++)
+        {
+            button = document.createElement("button")
+            h2 = document.createElement("h2")
+
+            button.className = "questionbutton"
+            h2.innerHTML = "Question "+(i+1)
+            if (flagged.indexOf(i) > -1) { h2.innerHTML += "<img class='flag' src='/Images/flag.png'>"}
+
+            button.onclick = jumptoquestion.bind(NaN,i)
+            button.append(h2)
+            questions.append(button)
+        }
+        uiswitch(totview)
+    }
+    function submit()
+    {
+
+        localStorage.setItem("answered", JSON.stringify(answered))
+        localStorage.setItem("qdata", JSON.stringify(qdata))
+        redirect("results")
+    }
+    function pickanswer(num)
+    {
+        answered[inx]=num
+        updatequestion()
+    }
+</script>

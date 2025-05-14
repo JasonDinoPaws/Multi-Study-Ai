@@ -1,0 +1,36 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header" style="width: 99%; height: 50; position: absolute; top: 5;background-color: black; display: flex;"> 
+        <button style="width: 50;" onclick="redirect('home')"><img src="/Images/home.png"></button>
+        <h1 id="leadername" style="width: 400; background-color: wheat; height: 100%;margin: 0 10;">ITF+ leaderboard</h1>
+        <input type="text" placeholder="User Search" style="height: 75%;width: 275;margin: 6 10;">
+        <button style="margin: 6 5; width: 35;"><<</button>
+        <button style="margin: 6 5; width: 35;"><</button>
+        <input type="text" placeholder="#" style="height: 75%;width: 45;margin: 6 5;text-align: center;">
+        <button style="margin: 6 5; width: 35;">></button>
+        <button style="margin: 6 5; width: 35;">>></button>
+        <div id="right" style="right: 0;position: absolute;height: 100%;width: 25%;display: flex; justify-content: right;background-color: darkblue;">
+            <button id="settings" class="rightbutton" onclick="redirect('settings')"><img src="/Images/settingsgear.png"></button>
+            <button id="profile" class="rightbutton" onclick="redirect('usr')"><img src="/Images/profilephoto.jpeg"></button>
+        </div>
+    </div>
+    <div style="background-color: wheat; width: 99%; height: 93%; position: absolute;top: 60;" id="leaderboard">
+        <div style="background-color: green;width: 100%;height: 45;display: flex;align-items: center;text-align: center;">
+            <h1 style="margin: 0 5; width: 25%;background-color: white;height: 85%;">Username</h1>
+            <h1 style="margin: 0 5; width: 10.5%;background-color: white;height: 85%;">Practice%</h1>
+            <h1 style="margin: 0 5; width: 10.5%;background-color: white;height: 85%;">Answered</h1>
+            <h1 style="margin: 0 5; width: 10.5%;background-color: white;height: 85%;">Correct</h1>
+            <h1 style="margin: 0 5; width: 10.5%;background-color: white;height: 85%;">Incorrect</h1>
+        </div>
+    </div>
+    <script src="redirects.js"></script>
+    <script>
+        const topic = localStorage.getItem("topic")
+        localStorage.removeItem("topic")
+
+        document.getElementById("leadername").innerHTML = topic+" leaderboard"
+
+    </script>
+</body>

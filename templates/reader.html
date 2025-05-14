@@ -1,0 +1,108 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="redirects.js"></script>
+</head>
+<body>
+    <div id="header" class="header">
+        <button style="width: 50;" onclick="redirect('home')"><img src="/Images/home.png"></button>
+        <h1 id="index" style="width: 400; background-color: wheat; height: 100%;margin: 0 10;">Reader</h1>
+        <select id="topic" onchange="topicchage()">
+        </select> 
+        <select id="chapter" onchange="updatepdf()">
+        </select>
+    </div>
+    <embed id="reader" src="/topics//ITF+/Chapter 1.pdf" class="body" />
+    <div id="footer" class="footer"> 
+        <button id="prev" class="footer_button_left" onclick="updatepdf(-1)"><- Previous Chapter</button>
+        <button id="next" class="footer_button_right" onclick="updatepdf(1)">Next Chapter -></button>
+    </div>
+    <script>
+        const reader = document.getElementById("reader")
+        const topic_c = document.getElementById("topic")
+        const chapter_c = document.getElementById("chapter")
+        const next = document.getElementById("next")
+        const prev = document.getElementById("prev")
+
+        topic = localStorage.getItem("topic")
+        chap = localStorage.getItem("chapter")
+        var topics = []
+        var chapters = []
+
+        function updatepdf(id=0)
+        {
+            topic = topic_c.value
+            chap = chapter_c.value
+            chapinx = chapter_c.selectedIndex
+
+            
+            if (id != 0 && chapinx+id > -1 && chapinx+id < chapters.length)
+            {
+                chapinx += id
+                chap = chapters[chapinx]
+                chapter_c.selectedIndex = chapinx
+            }
+
+            if (chapinx == 0 )
+                prev.style.display = "none"
+            else if (chapinx == chapters.length-1)
+                next.style.display = "none"
+            else
+            {
+                prev.style.display = ""
+                next.style.display = ""
+            }
+
+            fetch("/topic/get_pdf", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ topic, chap })
+            })
+            .then(async response =>  {
+                const text =  await response.text()
+                reader.src = text
+            })
+        }
+        function topicchage()
+        {
+            val = topic_c.value
+            chapter_c.innerHTML = ""
+            fetch("/topic/"+val+"/get_names")
+            .then(response => response.json())
+            .then(data => {
+                chapters = data
+                for (i = 0; i < data.length; i++)
+                {
+                   opti = document.createElement("Option")
+                   opti.innerHTML = data[i]
+
+                    if (chap = data[i])
+                        chapter_c.selectedIndex = i
+
+                   chapter_c.append(opti) 
+                }
+                updatepdf()
+            })
+        }
+
+        fetch("/topic/get_names")
+            .then(response => response.json())
+            .then(data => {
+                topic_data = data
+                data.forEach(element => {
+                    opti = document.createElement("Option")
+                    opti.innerHTML = element
+                    topic_c.append(opti)
+                });
+                topic_c.value = topic
+                topicchage()
+                updatepdf()
+            })        
+        
+
+        localStorage.removeItem("topic")
+        localStorage.removeItem("chapter")
+    </script>
+</body>

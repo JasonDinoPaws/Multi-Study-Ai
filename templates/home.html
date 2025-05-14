@@ -1,0 +1,178 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="header" style="width: 99%; height: 50; position: absolute; top: 5;background-color: black; display: flex;"> 
+        <h1 style="width: auto; background-color: wheat; height: 100%;margin: 0 0;width: 25%;">Home</h1> 
+        <div id="right" style="right: 0;position: absolute;height: 100%;width: 25%;display: flex; justify-content: right;background-color: darkblue;">
+            <button id="settings" class="rightbutton" onclick="redirect('settings')"><img src="/Images/settingsgear.png"></button>
+            <button id="profile" class="rightbutton" onclick="redirect('usr')"><img src="/Images/profilephoto.jpeg"></button>
+        </div>
+        <div style="position: absolute;width: 50%; align-items: center;left: 25%; height: 100%;text-align: center;margin: 0 0;background-color: gray;">
+            <button class="dirbutton" onclick="pageswitch('generic','Info')">Info</button>
+            <button class="dirbutton" onclick="pageswitch('study')">Study</button>
+            <button class="dirbutton" onclick="pageswitch('generic','quiz')">Quiz</button>
+            <button class="dirbutton" onclick="pageswitch('generic','pracetice')">Test</button>
+            <button class="dirbutton" onclick="pageswitch('generic','leaderboard')">leaderboard</button>
+        </div>
+    </div>
+
+    <div id="body" style="background-color: gray; width: 99%;position: absolute; top: 60; height: 94%;">
+        <div id="none" style="width: 100%;height: 100%;display: none;">
+            <div style="width: 100%; height: 25%;">
+                <h2 style="width: 100%;text-align: center;margin: 0 0;height: 12.5%;">About</h2>
+                <p id="about" style="width: 100%;text-align: center;height: 85.5%;margin: 0 0;">
+                    asasdasd<br>
+                </p>
+                <div style="background-color: rgba(0, 0, 0, 0.2); width: 100%; height: 2%;border-radius: 20px;"></div>
+            </div>
+            <div style="background-color: rgba(0, 0, 0, 0.2); width: .5%; height: 75%;position: absolute; left: 50%; bottom: 0;"></div>
+            <div style="width: 50%; height: 75%;position: absolute;left: 0;top: 25%;">
+                <h2 style="width: 100%;text-align: center;margin: 0 0;height: 5%;">News</h2>
+                <div id="news" style="width: 100%;text-align: center;align-items: center;">
+                </div>
+            </div>
+            
+            <div style="width: 50%; height: 75%;position: absolute;right: 0;top: 25%;">
+                <h2 style="width: 100%;text-align: center;margin: 0 0;height: 5%;">Events</h2>
+                <div id="events" style="width: 100%;text-align: center;align-items: center;">
+                </div>
+            </div>
+        </div>
+        <div id="study" style="width: 100%;height: 100%;display: none;">
+            <h2 style="width: 100%;text-align: center;margin: 0 0;">Study</h2>
+            <div id="studyshow" style="background-color: wheat;width: 100%;height: 94.5%;margin: 5 auto;grid-template-columns: repeat(3, 1fr);display: grid;" class="scroll">
+            </div>
+        </div>
+        <div id="generic" style="width: 100%;height: 100%;display: none;">
+            <h2 style="width: 100%;text-align: center;margin: 0 0;">quiz</h2>
+            <div id="gendiv" style="background-color: wheat;width: 100%;height: 94.5%;margin: 5 auto;" class="scroll">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var current = "none"
+        var section = ""
+        const about = document.getElementById("about")
+        const news = document.getElementById("news")
+        const events = document.getElementById("events")
+        const studydiv = document.getElementById("studyshow")
+        const quizdiv = document.getElementById("quizdiv")
+        const gendiv = document.getElementById("gendiv")
+        const diff = document.getElementById("Diff")
+        const quest = document.getElementById("quizamount")
+        
+
+        // Functions
+        function pageswitch(np,second=""){
+            if (second != ""? section == second: section == np){
+                np = "none"
+                second = NaN
+            }
+            const page = document.getElementById(np)
+
+            switch (np){
+                case "generic":
+                   page.children[0].innerHTML=second
+                    break;
+            }
+            document.getElementById(current).style.display="none"
+            page.style.display=""
+            section = second == ""?  np: second
+            current = np
+        }
+        function GenTopicButton(topic)
+        {
+            localStorage.setItem("topic",topic)
+            switch (section){
+                case "leaderboard":
+                    redirect("leaderboard")
+                    break;
+                case "Info":
+                    redirect("Info")
+                    break;
+                case "pracetice":
+                    localStorage.setItem("type","practice")
+                    redirect("questions")
+                    break;
+                case "quiz":
+                    localStorage.setItem("type","quiz")
+                    redirect("questions")
+                    break;
+            }
+        }
+        function Readersend(topic,chapter)
+        {
+            localStorage.setItem("topic",topic)
+            localStorage.setItem("chapter",chapter)
+            redirect("reader")
+        }
+
+        // Default Page section
+        fetch("/get/home_about")
+            .then(response => response.json())
+            .then(data => {
+                about.innerHTML = data.replaceAll("\n", "<br>")
+            })
+        fetch("/get/home_news")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(element => {
+                    p = document.createElement("p")
+                    p.innerHTML =  element.replaceAll("\n", "<br>")
+                    news.append(p)
+                });
+            })
+        fetch("/get/home_events")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(element => {
+                    p = document.createElement("p")
+                    p.innerHTML =  element.replaceAll("\n", "<br>")
+                    events.append(p)
+                });
+            })
+        
+        // study,quiz,practice,leaderboard
+        fetch("/topic/get_all")
+            .then(response => response.json())
+            .then(data => {
+                for (const [topic, value] of Object.entries(data)) {
+                    div = document.createElement("div")
+                    chaps = document.createElement("div")
+                    img = document.createElement("img")
+                    div.className = "topicdiv"
+                    img.src = value[1]
+                    img.alt = topic
+                    img.className = "topicicon"
+                    chaps.style="width: 75%;height: 100%;right: 0;vertical-align: middle;align-content: center;"
+
+                    value[0].forEach(element => {
+                        button = document.createElement("button")
+                        button.innerHTML = element
+                        button.onclick = Readersend.bind(NaN,topic,chaps.children.length+1)
+                        chaps.append(button)
+                    });
+
+                    genbutton = document.createElement("button")
+                    genimg = document.createElement("img")
+                    genimg.src = value[1]
+                    genimg.alt = topic
+                    genimg.className = "topicicon"
+                    genbutton.onclick = GenTopicButton.bind(NaN,topic)
+                    genbutton.append(genimg)
+                    gendiv.append(genbutton)
+
+                    div.append(img)
+                    div.append(chaps)
+                    studydiv.append(div)
+                }
+            })
+
+        pageswitch("none")
+    </script>
+    <script src="redirects.js"></script>
+</body>

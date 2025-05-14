@@ -1,0 +1,25 @@
+<script src="redirects.js"></script>
+<script>
+    const sess = localStorage.getItem("sessionid")
+    const email = localStorage.getItem("email")
+    fetch("/login/valid/session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ sess, email })
+        })
+        .then(async response => {
+            const text = await response.text();
+            console.log("Raw Valid:", text);
+            
+            const json = JSON.parse(text);
+            if (json == "False")
+                redirect("login")
+            else
+                redirect("home")
+        })
+        .catch(e => {
+            redirect("login")
+        })
+</script>

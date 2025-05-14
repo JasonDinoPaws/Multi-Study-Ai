@@ -1,0 +1,85 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="redirects.js"></script>
+</head>
+<body>
+    <div id="header" style="width: 99%; height: 50; position: absolute; top: 5;background-color: black; display: flex;"> 
+        <button style="width: 50;" onclick="redirect('home')"><img src="/Images/home.png"></button>
+            <h1 id="index" style="width: 400; background-color: wheat; height: 100%;margin: 0 10;">Results</h1> 
+        </div>
+        <div style="background-color: wheat; width: 99%; height: 87%; position: absolute;top: 60;">
+            <div style="width: .5%;background-color: black;height: 100%;left: 50%;position: absolute;"></div>
+            <div id="questions" style="width: 50%; height: 100%;">
+                <div class="lbdiv">
+                    <h2 style="width: 50%;margin: 5 0;">Question #</h2>
+                    <h2 style="width: 25%;margin: 5 0;">Your</h2>
+                    <h2 style="width: 25%;margin: 5 0;">Correct</h2>
+                </div>
+            </div>
+            <h1 style="width: 50%;position: absolute;left: 50%;text-align: center;height: 6%;top: 0;background-color: gray;margin: 0 0;">Ai responce</h1>
+            <p id="Airesponce" style="position: absolute;width: 48.5%;left: 51%;height: 93%;top: 7%;">Loading response</p>
+        </div>
+        <div id="footer" style="width: 99%; height: 50; position: absolute; bottom: 5;background-color: black; display: flex;"> 
+            <h3 style="width: 100%;color: white;text-align: center;">Ai was used to generate questions and responses, it can be wrong</h3>
+        </div>
+
+    <script>
+        const questlist = document.getElementById("questions")
+        const responce = document.getElementById("Airesponce")
+
+        let qdata = JSON.parse(localStorage.getItem("qdata"))
+        let answerd = JSON.parse(localStorage.getItem("answered"))
+        localStorage.removeItem("qdata")
+        localStorage.removeItem("answered")
+
+        for (i = 0 ; i < answerd.length; i++)
+        {
+            div = document.createElement("div")
+            quest = document.createElement("h2")
+            your = document.createElement("h2")
+            correct = document.createElement("h2")
+
+            quest.innerHTML = "Question "+(i+1)
+            your.innerHTML = String.fromCharCode(answerd[i] + 97).toUpperCase()
+            correct.innerHTML = qdata[i].Answer
+
+            div.className = "lbdiv"
+            quest.style = "width: 50%;margin: 5 0;"
+            your.style ="width: 25%;margin: 5 0;"
+            correct.style = "width: 25%;margin: 5 0;"
+
+            div.append(quest)
+            div.append(your)
+            div.append(correct)
+            questlist.append(div)
+        }
+        fetch("/Ai/Analyze", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ qdata, answerd })
+            })
+            .then(async response =>  {
+                const text =  await response.text()
+                responce.innerHTML = text.replaceAll("**Question","<br><br>**Question").replaceAll("* Question","<br><br>* Question")
+            })
+
+        topic = localStorage.getItem("topic")
+        type = localStorage.getItem("type")
+        sess = localStorage.getItem("sessionid")
+        email = localStorage.getItem("email")
+
+        localStorage.removeItem("topic")
+        localStorage.removeItem("type")
+        fetch("/usr/update/"+topic, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ sess, email, type, qdata, answerd })
+            })
+
+    </script>
+</body>

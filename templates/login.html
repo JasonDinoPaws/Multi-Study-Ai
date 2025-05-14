@@ -1,0 +1,120 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="login" style="position: absolute; width: 300;height: 190; top: 38.5%;left: 41%;background-color: wheat; ">
+        <h2 style="position: absolute;top: -15;width: 100%;text-align: center;">Log in</h2>
+        <input type="text" placeholder="Email" style="position: absolute;top: 50;width: 96%;height: 40;text-align: center; left: 2%;" maxlength="20">
+        <input type="password" placeholder="Password" style="position: absolute;top: 100;width: 96%;height: 40;text-align: center; left: 2%;" onmouseover="if (document.activeElement !== this){this.type='text'};" onmouseout="this.type='password';"  maxlength="20">
+        <button style="position: absolute; width: 45%; height: 35; bottom: 5; left: 52.5%;" onclick="Login()">Login</button> 
+        <button style="position: absolute; width: 45%; height: 35; bottom: 5; left: 2.5%;" onclick="pageswitch()">Create Account</button> 
+    </div>
+
+
+    <div id="create" style="position: absolute; width: 300;height: 290; top: 31%;left: 41%;background-color: wheat;display: none;">
+        <h2 style="position: absolute;top: -15;width: 100%;text-align: center;">Account Creation</h2>
+        <input type="text" placeholder="Username" style="position: absolute;top: 50;width: 96%;height: 40;text-align: center; left: 2%;"  maxlength="20">
+        <input type="text" placeholder="Email" style="position: absolute;top: 100;width: 96%;height: 40;text-align: center; left: 2%;"  maxlength="20">
+        <input type="password" placeholder="Password" style="position: absolute;top: 150;width: 96%;height: 40;text-align: center; left: 2%;" onmouseover="if (document.activeElement !== this){this.type='text'};" onmouseout="this.type='password';"  maxlength="20">
+        <input type="password" placeholder="Confirm Password" style="position: absolute;top: 200;width: 96%;height: 40;text-align: center; left: 2%;" onmouseover="if (document.activeElement !== this){this.type='text'};" onmouseout="this.type='password';"  maxlength="20">
+        <button id="acccreate" style="position: absolute; width: 45%; height: 35; bottom: 5; left: 52.5%;" onclick="CreateAccount()">Create Account</button> 
+        <button style="position: absolute; width: 45%; height: 35; bottom: 5; left: 2.5%;" onclick="pageswitch()">Login page</button> 
+    </div>
+
+    <script src="redirects.js"></script>
+    <script>
+        const login = document.getElementById("login")
+        const create = document.getElementById("create")
+        const createbutton = document.getElementById("acccreate")
+        function pageswitch()
+        {
+            login.style.display = login.style.display == "none"? "": "none"
+            create.style.display = create.style.display == "none"? "": "none"
+        }
+
+        async function encrypt(text)
+        {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashedPass = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashedPass
+        }
+        function CreateAccount()
+        {
+            const name = create.children[1].value
+            const email = create.children[2].value
+            const pass = create.children[3].value
+            const conpass = create.children[4].value
+
+            if (pass != conpass)
+            {
+                alert("Password and Confirm password are not the same")
+                return
+            }
+
+            createbutton.style.display = "none"
+            fetch("/login/create/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name, email, pass })
+            })
+            .then(async response => {
+                createbutton.style.display = ""
+                const text = await response.text();
+                console.log("Raw create:", text);
+                try {
+                    const json = JSON.parse(text);
+                    if (json == "False") {alert("Email already in use")}
+                    else{
+                        login.children[1].value = email
+                        login.children[2].value = pass
+                        Login()
+                    }
+                } catch (e) {
+                    alert(text)
+                    return
+                }
+            })
+        }
+        function Login()
+        {
+            const email = login.children[1].value
+            const pass = login.children[2].value
+
+            fetch("/login/valid/empas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, pass })
+            })
+            .then(async response => {
+                const text = await response.text();
+                console.log("Raw Valid:", text);
+                try {
+                    const json = JSON.parse(text);
+                    if (json == "False") {alert("Login credidenals not valid or account doesn't exist")}
+                    else{
+                        fetch("/login/sesson/"+email)
+                        .then(response => response.json())
+                        .then(data => {
+                            localStorage.setItem("sessionid",data)
+                            localStorage.setItem("email",email)
+                            redirect("home")
+                        })
+                    }
+                } catch (e) {
+                    alert(text)
+                    return
+                }
+            })
+        }
+
+        login.style.display = ""
+        create.style.display = "none"
+    </script>
+</body>
