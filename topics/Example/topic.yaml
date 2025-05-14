@@ -1,0 +1,11 @@
+des: "An entry-level certification designed to introduce individuals to basic IT knowledge and skills."
+Difficulty: "Easy"
+QuestionCount: 70
+Time: 60
+Valid: "Life"
+Price: "$84"
+Code: [
+  ["FC0-U61","https://www.comptia.jp/pdf/CompTIA%20IT%20Fundamentals%20FC0-U61%20Exam%20Objectives.pdf"]
+]
+Pros: "Easiest of all of the exams. Can be taken in class. Doesn’t require parents to be present."
+Cons: "Least valuable. Lesser known."
