@@ -1,0 +1,67 @@
+# Https
+KeyPath: "private.key"
+CertificatePath: "certificate.crt"
+
+# Ai config
+model: "llama3.2"
+tokencount: 66856
+system: "You are a Ai that helps people study by generating questions based off of given content. You will also help people figure out what they are missing with constructive feedback. You are also in a school so use school appropriate lanuage. Speak in simple terms. Also speak like a cave man."
+QuestionFormat: "{'Question':'','Options':[...],'Answer': 'A..Z'}"
+ExampleQuestion: "{'Question': 'What video connecter gives out analog video?', 'Options': ['VGA', 'HDMI',  'DVI', 'USB-C'], 'Answer': 'A'}"
+QuestionRequirement: [
+  "each question must fit into 1 line",
+  "there must be 4 re more options to choose from",
+  "the options should be sort",
+  "there can only one answer and must be one of the options",
+  "the answer can only be a integer",
+  "each option but just put into a string"
+]
+Difficultys: ["Easy","Medium","Hard"]
+
+Analyzefromat: [
+  "Analyze this piece(s) of data.",
+  "The responce must be human readable.",
+  "The responce must only be readable to a computer.",
+  "When analyzeing each question start it off by **Question #**",
+  "Be as detaled as possible on what they got wrong"
+]
+
+
+# Security
+banned_paths: ["users/"]
+validemails: ["@gmail.com","@lpsk12.org","@lps.k12.co.us"]
+banned_username_lists: ["https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/refs/heads/master/en"]
+banned_usernames: []
+banned_message: "You're in a school, if i were to make multiple messages telling you how many times your tried it would just be a waste. GIVE UP and be creative and original."
+ai_insult_chance: 10
+
+# Topics config
+topicPath: "topics"
+reviewbanned: "practice question,review question"
+
+# Users config
+userPath: "users"
+relogin: 30
+Usertemp: {
+  "Username":"",
+  "Email":"",
+  "Password":"",
+  "Priv": 0,
+  "settings":{
+    "theme":"white",
+  },
+  "session": "",
+  "data":{},
+}
+Topicdatatmp: {
+  "Total":0,
+  "Correct":0,
+  "Wrong":0,
+  "PractPrecent":0,
+}
+
+
+# Misc
+home_about: "This is test"
+home_news: ["Pope died"]
+home_events: ["Pope re-elected"]
